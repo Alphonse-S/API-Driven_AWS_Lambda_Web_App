@@ -6,18 +6,18 @@ data "archive_file" "lambda_zip" {
 
 
 
-
+## Define lambda function configuration
 resource "aws_lambda_function" "get_message" {
-  filename         = "lambda-function/message.zip"
-  function_name    = "getMessageFunction"
+  filename         = var.lambda_filename
+  function_name    = var.lambda_function_name
   role             = aws_iam_role.lambda_exec.arn
-  handler          = "message.py.lambda_handler"
-  runtime          = "python3.9"
-  timeout          = 10
+  handler          = var.lambda_handler
+  runtime          = var.lambda_runtime
+  timeout          = var.lambda_timeout
 
   environment {
     variables = {
-      TABLE_NAME = aws_dynamodb_table.dynamic_string_table.name
+      TABLE_NAME = var.dynamodb_table_name
     }
   }
 

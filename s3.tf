@@ -55,7 +55,15 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 resource "aws_s3_object" "index" {
   bucket       = aws_s3_bucket.static_site.id
   key          = "index.html"
-  source       = "${path.module}/website/index.html"
+  content       = data.template_file.index_html.rendered
   content_type = "text/html"
 
+}
+
+data "template_file" "index_html" {
+  template = file("${path.module}/website/index.template.html")
+
+  vars = {
+    api_url = aws_apigatewayv2_api.message_api.api_endpoint
+  }
 }

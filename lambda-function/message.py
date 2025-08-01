@@ -1,21 +1,36 @@
 import json
 import boto3
+import os
 
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('dynamic-string-table')
+table_name = os.environ.get('TABLE_NAME', 'dynamic-string-table')
+table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
-    response = table.get_item(Key={'id': 'welcome-text'})
-    message = response.get('Item', {}).get('message', 'Hello from Terraform! 🚀')
-    
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',  
-            'Access-Control-Allow-Methods': 'GET',  
-        },
-        'body': json.dumps({'message': message})
-    }
+    try:
+        # Get item from DynamoDB
+        response = table.get_item(Key={'id': 'welcome-text'})
+        message = response.get('Item', {}).get('message', 'No message found.')
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"message": message})
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"error": str(e)})
+        }
+
+
 
 
