@@ -1,0 +1,34 @@
+## Solutions and the available options for the project
+The goal was to provision a cloud-based service using Infrastructure as Code (IaC) that serves a dynamically updateable HTML page. The string displayed on the page should be editable without needing to redeploy, and any user visiting the site should always see the most recent value. 
+The IaC technology in provisioning the services is terraform. I used the following services on AWS, S3 static site hosting that	serves the HTML page, API Gateway for publicly accessible endpoint for interaction, AWS Lambda to handles GET and POST logic for the message, Amazon DynamoDB that stores the current message string. 
+The HTML page uses JavaScript to fetch the current string via the API and render it in a <h1> tag. An additional POST endpoint allows updating the string value, which is persisted in DynamoDB — all without any need to redeploy the infrastructure or rebuild the HTML.
+Available options and alternatives considered are terraform to alternatives such as AWS CDK, AWS SAM, Pulumi. S3 for the static website hosting to alternatives such as EC2, Amplify. The API Gateway chosen is HTTP API to alternatives such as REST API, ALB + Lambda. The lambda (python lambda) to EC2, Fargate, Containers. Lambda is serverless, cost-effective, and needs no ongoing management. The Database (DynamoDB) to alternatives like S3 file, RDS, SSM Parameter Store. DynamoDB is scalable, fast, and ideal for simple key-value storage.
+
+## Reasoning Behind My Decisions
+-Serverless-first approach: Keeps infrastructure light, scalable, and low-cost.
+
+-Terraform for repeatability: Ensures full reproducibility of infrastructure. Anyone can redeploy the stack with terraform apply.
+
+-DynamoDB for flexibility: No schema required, instant updates, and built-in high availability.
+
+-API Gateway + Lambda: Offers a clean separation of logic and frontend, and makes the system extensible in future.
+
+## How I Would Embellish the Solution If I Had More Time
+If time permitted, I would improve and expand the project in the following ways:
+Use Amazon Cognito or a simple JWT-based login.
+
+ 1. Custom Domain + SSL
+-Route a domain to S3 via Route 53 + CloudFront.
+-Add SSL using AWS Certificate Manager for HTTPS support.
+
+ 2. CI/CD Automation
+-Set up GitHub Actions to automatically run Terraform and upload HTML when changes are pushed.
+-Improves team collaboration and reduces manual steps.
+
+ 3. Monitoring and Analytics
+-Enable CloudWatch Logs + Metrics for Lambda and API Gateway.
+-Add simple usage analytics (example, count number of views/updates).
+
+ 4. Environment Isolation
+-Support for dev, staging, and prod environments using Terraform workspaces or modules.
+-Cleaner testing and safer deployments.
